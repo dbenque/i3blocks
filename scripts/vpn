@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -e /proc/sys/net/ipv4/conf/tun0 ]
+then
+ echo "VPN 🔒"
+ echo "🔒"
+ echo \#00FF00 # color
+else
+echo "VPN 🔓"
+echo "🔓"
+echo \#FF0000 # color
+fi

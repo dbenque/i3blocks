@@ -16,31 +16,30 @@
 
 #------------------------------------------------------------------------
 
-INTERFACE="${BLOCK_INSTANCE:-wlan0}" 
+INTERFACE="${BLOCK_INSTANCE:-eno1}" 
 
 #------------------------------------------------------------------------
 
 # As per #36 -- It is transparent: e.g. if the machine has no battery or wireless
 # connection (think desktop), the corresponding block should not be displayed.
-[[ ! -d /sys/class/net/${INTERFACE}/wireless ]] ||
+[[ ! -d /sys/class/net/${INTERFACE} ]] ||
     [[ "$(cat /sys/class/net/$INTERFACE/operstate)" = 'down' ]] && exit
 
 #------------------------------------------------------------------------
 
-QUALITY=$(grep $INTERFACE /proc/net/wireless | awk '{ print int($3 * 100 / 70) }')
-ESSID=$(iwgetid -r)
+SPEED=$(cat /sys/class/net/$INTERFACE/speed)
 IPADDR=$(ip addr show $INTERFACE | perl -n -e "/inet6? ([^\/]+).* scope global/ && print \$1 and exit")
 #------------------------------------------------------------------------
 
-echo "📶$QUALITY% $ESSID $IPADDR" # full text
-echo "📶$QUALITY%" # short text
+echo "🖧$SPEED Mbits/sec $IPADDR" # full text
+echo "🖧$IPADDR" # short text
 
 # color
-if [[ $QUALITY -ge 80 ]]; then
+if [[ $SPEED -ge 1000 ]]; then
     echo "#00FF00"
-elif [[ $QUALITY -ge 60 ]]; then
+elif [[ $QUALITY -ge 100 ]]; then
     echo "#FFF600"
-elif [[ $QUALITY -ge 40 ]]; then
+elif [[ $QUALITY -ge 10 ]]; then
     echo "#FFAE00"
 else
     echo "#FF0000"
